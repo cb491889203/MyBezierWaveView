@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WaveView">
+        <!--波纹颜色-->
+        <attr name="wave_wavecolor" format="color" />
+        <!--波纹速度,每20毫秒移动的像素值 -->
+        <attr name="wave_speed" format="integer" />
+        <!--波纹峰值高度(正数)-->
+        <attr name="wave_height" format="dimension" />
+        <!--波纹水平基准线-->
+        <attr name="wave_level_height" format="dimension" />
+        <!--波纹数量-->
+        <attr name="wave_count" format="integer" />
+        <!--波纹速度差,每增加一条波纹,速度便增加这个值的倍数-->
+        <attr name="wave_speed_offset" format="float" />
+        <!--波纹初始背景色-->
+        <attr name="wave_begin_color" format="color" />
+        <!--波纹结束背景色-->
+        <attr name="wave_end_color" format="color" />
+    </declare-styleable>
+</resources>
