@@ -50,6 +50,9 @@ public class WaveView extends View {
 	/** 波浪起伏幅度 波峰高度 */
 	private float mWaveHeight = 0;
 
+	/** 贝塞尔曲线控制点的高度,以水平线高度为0计算. 在这里是规则的曲线,所以控制点高度为波峰的2倍*/
+	private int mControllerPointHeight;
+
 	/** 波长 */
 	private float mWaveWidth = 0;
 
@@ -118,10 +121,10 @@ public class WaveView extends View {
 							point.setY(mLevelLine);
 							break;
 						case 1:
-							point.setY(mLevelLine + mWaveHeight);
+							point.setY(mLevelLine + mControllerPointHeight);
 							break;
 						case 3:
-							point.setY(mLevelLine - mWaveHeight);
+							point.setY(mLevelLine - mControllerPointHeight);
 							break;
 					}
 				}
@@ -233,11 +236,11 @@ public class WaveView extends View {
 		mPaint.setShader(newShader);
 
 		//如果没有手动指定波峰高度和水平线,则取控件高度的一半.
+		// 波长等于四倍View宽度也就是View中只能看到四分之一个波形，这样可以使起伏更明显
 		mWaveHeight = mWaveHeight == 0 ? mViewWidth / 20 : mWaveHeight;
 		mLevelLine = mLevelLine == 0 ? mViewHeight / 2 : mLevelLine;
-		//宽和高的差在40以内视为宽高数据获得正确，否则视为错误
-		// 波长等于四倍View宽度也就是View中只能看到四分之一个波形，这样可以使起伏更明显
 		mWaveWidth = mViewWidth;
+		mControllerPointHeight = (int)(mWaveHeight * 2);
 		// 左边隐藏的距离预留一个波形
 		mLeftSide = -mWaveWidth;
 
@@ -276,11 +279,11 @@ public class WaveView extends View {
 						break;
 					case 1:
 						// 往下波动的控制点
-						y = mLevelLine + mWaveHeight;
+						y = mLevelLine + mControllerPointHeight;
 						break;
 					case 3:
 						// 往上波动的控制点
-						y = mLevelLine - mWaveHeight;
+						y = mLevelLine - mControllerPointHeight;
 						break;
 				}
 				pointList.add(new Point(x, y));
