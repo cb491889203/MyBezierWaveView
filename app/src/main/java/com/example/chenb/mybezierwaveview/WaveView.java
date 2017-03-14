@@ -3,9 +3,9 @@ package com.example.chenb.mybezierwaveview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.os.Handler;
 import android.os.Message;
@@ -26,6 +26,9 @@ public class WaveView extends View {
 
 	private static final int STOPPED = 65;
 
+	/** 每次刷新屏幕的时间,单位为毫秒,时间越小,则波纹的速度就越快 */
+	private static final int FLUSHTIME = 10;
+
 	/** View宽度 */
 	private int mViewWidth;
 
@@ -35,7 +38,7 @@ public class WaveView extends View {
 	/** 波纹数量 */
 	private int mWaveCount;
 
-	/** 波纹速度 */
+	/** 波纹速度,默认为5个像素,及每刷新一次屏幕波纹移动5个像素.值增加,则波纹移动越快 */
 	private float mWaveSpeed;
 
 	/** 波纹速度差 */
@@ -77,8 +80,8 @@ public class WaveView extends View {
 	/** 循环绘制任务 */
 	private MyTimerTask mTask;
 
-	/** 保证只测量一次,节约资源 */
-	private boolean isMeasured = false;
+	/** 数据是否已经加载完成(加载真实的数据,而不是预加载),保证只初始化一次,节约资源 */
+	private boolean isDataSetted = false;
 
 	/** 波纹的颜色 */
 	private int waveColor;
@@ -184,8 +187,8 @@ public class WaveView extends View {
 		this.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
 			public void onGlobalLayout() {
-				if (!isMeasured) {
-					isMeasured = true;
+				if (!isDataSetted) {
+					isDataSetted = true;
 					mViewHeight = getHeight();
 					mViewWidth = getWidth();
 					initData();
@@ -207,7 +210,7 @@ public class WaveView extends View {
 			initData();
 		}
 		mTask = new MyTimerTask(updateHandler);
-		timer.schedule(mTask, 0, 20); //每20毫秒刷新一次,如果增加时间,则波纹移动速度变慢,反之变快.
+		timer.schedule(mTask, 0, FLUSHTIME); //每FLUSHTIME毫秒刷新一次,如果增加时间,则波纹移动速度变慢,反之变快.
 		isStopped = false;
 	}
 
@@ -225,8 +228,8 @@ public class WaveView extends View {
 		mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
 		mPaint.setColor(waveColor);
 		//渐变色
-		Shader newShader = new RadialGradient(mViewWidth * 3 / 4, mLevelLine + 2 * mWaveHeight, mViewWidth / 3, new int[]{waveBeginColor,
-				waveEndColor}, new float[]{0.0f, 1.0f}, Shader.TileMode.CLAMP);
+		Shader newShader = new LinearGradient(0, 0, 0, mViewHeight, new int[]{waveBeginColor, waveEndColor}, new float[]{0.0f, 1.0f},
+				Shader.TileMode.CLAMP);
 		mPaint.setShader(newShader);
 
 		//如果没有手动指定波峰高度和水平线,则取控件高度的一半.
@@ -308,6 +311,9 @@ public class WaveView extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
+		if (!isDataSetted) {
+			initData(); //先在onDraw中初始化一次(这里只是预加载). 在ViewTreeObserver中获取到真实的view宽高后再次初始化数据
+		}
 		if (!mPointsLists.isEmpty()) {
 			//循环绘制3条波浪
 			for (int k = 0; k < mWaveCount; k++) {

@@ -16,7 +16,7 @@
         app:wave_begin_color="#55ab6c73"
         app:wave_count="3"
         app:wave_end_color="#dd553982"
-        app:wave_height="20dp"
+        app:wave_height="80px"
         app:wave_level_height="70dp"
         app:wave_speed="5"
         app:wave_speed_offset="0.7"
